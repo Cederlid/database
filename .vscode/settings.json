@@ -1,0 +1,5 @@
+{
+    "dataworkspace.excludedProjects": [
+        "AI24/AI24.sqlproj"
+    ]
+}
