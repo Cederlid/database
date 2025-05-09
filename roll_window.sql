@@ -1,7 +1,5 @@
 USE AI24
 
-DROP TABLE Products;
-
 CREATE TABLE SalesPeople (
     SalesPersonID INT PRIMARY KEY,
     FirstName NVARCHAR(50),
