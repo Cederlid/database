@@ -17,6 +17,11 @@ FROM
 WHERE
     Outcome LIKE '%Success%';
 
+SELECT
+    *
+FROM
+    SuccessfulMissions;
+
 --UPPGIFT 2. I kolumnen ’Operator’ har det smugit sig in ett eller flera mellanslag före
 --operatörens namn skriv en query som uppdaterar ”SuccessfulMissions” och tar
 --bort mellanslagen kring operatör.
@@ -25,6 +30,11 @@ UPDATE
     SuccessfulMissions
 SET 
     Operator = LTRIM(Operator);
+
+SELECT
+    *
+FROM
+    SuccessfulMissions;
 
 -- UPPGIFT 3. Skriv en select query som tar ut, grupperar, samt sorterar på kolumnerna
 -- ’Operator’ och ’Mission type’ från ”SuccessfulMissions”. Som en tredje kolumn
@@ -50,17 +60,20 @@ ORDER BY
 -- ”SuccessfulMissions” på ett sådant sätt att alla värden i kolumnen ’Spacecraft’
 -- endast innehåller originalnamnet, dvs ta bort alla paranteser och deras
 -- innehåll. Ex: ”Pioneer 0 (Able I)” => ”Pioneer 0”.
+UPDATE
+    SuccessfulMissions
+SET
+    Spacecraft =
+        CASE 
+            WHEN CHARINDEX('(', Spacecraft) > 0
+            THEN RTRIM(LEFT(Spacecraft, CHARINDEX('(', Spacecraft) -1))
+            ELSE Spacecraft
+        END;
 
 SELECT
-    Spacecraft AS OriginalName,
-    CASE 
-        WHEN CHARINDEX('(', Spacecraft) > 0
-        THEN RTRIM(LEFT(Spacecraft, CHARINDEX('(', Spacecraft) -1))
-        ELSE Spacecraft
-    END AS CleanedName
+    *
 FROM
     SuccessfulMissions;
-
 
 -- UPPGIFT 5. Ta ut samtliga rader och kolumner från tabellen ”Users”, men slå ihop
 -- ’Firstname’ och ’Lastname’ till en ny kolumn ’Name’, samt lägg till en extra
@@ -79,6 +92,11 @@ INTO
     NewUsers
 FROM
     Users;
+
+SELECT
+    *
+FROM
+    NewUsers;
 
 -- UPPGIFT 6. Skriv en query som returnerar en tabell med alla användarnamn i ”NewUsers”
 -- som inte är unika i den första kolumnen, och antalet gånger de är duplicerade i
@@ -117,17 +135,26 @@ HAVING
 
 -- UPPGIFT 8. Skapa en query som tar bort alla kvinnor födda före 1970 från ”NewUsers”.
 
+DELETE FROM
+    NewUsers
+WHERE
+    (Gender = 'Female' AND SUBSTRING(ID, 1, 2) < 70);
+
 SELECT
     *
 FROM
-    NewUsers
-WHERE
-    NOT (Gender = 'Female' AND SUBSTRING(ID, 1, 2) < 70);
-
+    NewUsers;
 -- UPPGIFT 9. Lägg till en ny användare (hitta på en) i tabellen ”NewUsers”.
 
 INSERT INTO NewUsers VALUES
 ('930613-6324', 'elekma', 'A33e67928d12r6c20t1e452h13d974e6', 'Ellinor','Ekmark','ellinor.ekmark@gmail.com', '0723365348', 'Ellinor Ekmark', 'Female');
+
+SELECT
+    *
+FROM
+    NewUsers
+WHERE 
+    Name = 'Ellinor Ekmark';
 
 --  UPPGIFT 10. För betyg VG (endast följande uppgift):
 -- Skriv en query som returnerar två kolumner ’gender’ och ’avarage age’, och två
@@ -204,3 +231,4 @@ SELECT
 FROM
     company.employees e1
 LEFT JOIN company.employees e2 ON e1.ReportsTo = e2.Id;
+
