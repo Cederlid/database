@@ -1,4 +1,4 @@
-USE everyloop
+USE everyloop 
 
 -- UPPGIFT 1. Använd ”SELECT INTO” för att ta ut kolumnerna ’Spacecraft’, ’Launch date’,
 --’Carrier rocket’, ’Operator’, samt ’Mission type’ för alla lyckade uppdrag
@@ -26,7 +26,7 @@ UPDATE
 SET 
     Operator = LTRIM(Operator);
 
---3. Skriv en select query som tar ut, grupperar, samt sorterar på kolumnerna
+-- UPPGIFT 3. Skriv en select query som tar ut, grupperar, samt sorterar på kolumnerna
 -- ’Operator’ och ’Mission type’ från ”SuccessfulMissions”. Som en tredje kolumn
 -- ’Mission count’ i resultatet vill vi ha antal uppdrag av varje operatör och typ. Ta
 -- bara med de grupper som har fler än ett (>1) uppdrag av samma typ och
@@ -44,8 +44,25 @@ HAVING
 ORDER BY
     Operator, [Mission type];
 
+-- UPPGIFT 4. För betyg VG (endast följande uppgift):
+-- I ett flertal fall har värden i kolumnen ’Spacecraft’ ett alternativt namn som står
+-- inom parantes, t.ex: ”Pioneer 0 (Able I)”. Skriv en query som uppdaterar
+-- ”SuccessfulMissions” på ett sådant sätt att alla värden i kolumnen ’Spacecraft’
+-- endast innehåller originalnamnet, dvs ta bort alla paranteser och deras
+-- innehåll. Ex: ”Pioneer 0 (Able I)” => ”Pioneer 0”.
 
---5. Ta ut samtliga rader och kolumner från tabellen ”Users”, men slå ihop
+SELECT
+    Spacecraft AS OriginalName,
+    CASE 
+        WHEN CHARINDEX('(', Spacecraft) > 0
+        THEN RTRIM(LEFT(Spacecraft, CHARINDEX('(', Spacecraft) -1))
+        ELSE Spacecraft
+    END AS CleanedName
+FROM
+    SuccessfulMissions;
+
+
+-- UPPGIFT 5. Ta ut samtliga rader och kolumner från tabellen ”Users”, men slå ihop
 -- ’Firstname’ och ’Lastname’ till en ny kolumn ’Name’, samt lägg till en extra
 -- kolumn ’Gender’ som du ger värdet ’Female’ för alla användare vars näst sista
 -- siffra i personnumret är jämn, och värdet ’Male’ för de användare där siffran är
@@ -63,7 +80,7 @@ INTO
 FROM
     Users;
 
--- 6. Skriv en query som returnerar en tabell med alla användarnamn i ”NewUsers”
+-- UPPGIFT 6. Skriv en query som returnerar en tabell med alla användarnamn i ”NewUsers”
 -- som inte är unika i den första kolumnen, och antalet gånger de är duplicerade i
 -- den andra kolumnen.
 
@@ -77,7 +94,7 @@ GROUP BY
 HAVING 
     COUNT(*) > 1;
 
--- 7. Skriv en följd av queries som uppdaterar de användare med dubblerade
+-- UPPGIFT 7. Skriv en följd av queries som uppdaterar de användare med dubblerade
 -- användarnamn som du fann ovan, så att alla användare får ett unikt
 -- användarnamn. D.v.s du kan hitta på nya användarnamn för de användarna, så
 -- länge du ser till att alla i ”NewUsers” har unika värden på ’Username’.
@@ -98,21 +115,39 @@ GROUP BY
 HAVING 
     COUNT(*) > 1;
 
---8. Skapa en query som tar bort alla kvinnor födda före 1970 från ”NewUsers”.
+-- UPPGIFT 8. Skapa en query som tar bort alla kvinnor födda före 1970 från ”NewUsers”.
 
 SELECT
     *
 FROM
     NewUsers
 WHERE
-   NOT (Gender = 'Female' AND SUBSTRING(ID, 1, 2) < 70);
+    NOT (Gender = 'Female' AND SUBSTRING(ID, 1, 2) < 70);
 
---9. Lägg till en ny användare (hitta på en) i tabellen ”NewUsers”.
+-- UPPGIFT 9. Lägg till en ny användare (hitta på en) i tabellen ”NewUsers”.
 
 INSERT INTO NewUsers VALUES
 ('930613-6324', 'elekma', 'A33e67928d12r6c20t1e452h13d974e6', 'Ellinor','Ekmark','ellinor.ekmark@gmail.com', '0723365348', 'Ellinor Ekmark', 'Female');
 
--- 11. Skriv en query som selectar ut alla (77) produkter i company.products
+--  UPPGIFT 10. För betyg VG (endast följande uppgift):
+-- Skriv en query som returnerar två kolumner ’gender’ och ’avarage age’, och två
+-- rader där ena raden visar medelåldern för män, och andra raden visar
+-- medelåldern på kvinnor för alla användare i tabellen ”NewUsers”.
+SELECT
+    Gender,
+    AVG(
+            DATEDIFF(
+                YEAR,
+                CAST('19' + SUBSTRING(ID, 1, 6) AS DATE),
+                GETDATE()
+            )
+    ) AS [Average age]
+FROM
+    NewUsers
+GROUP By
+    Gender;
+
+--  UPPGIFT 11. Skriv en query som selectar ut alla (77) produkter i company.products
 -- Dessa ska visas i 4 kolumner:
 -- Id – produktens id
 -- Product – produktens namn
@@ -128,24 +163,44 @@ FROM
 JOIN company.suppliers cs ON cp.SupplierId = cs.Id
 JOIN company.categories cc ON cp.CategoryId = cc.Id;
 
--- 12. Skriv en query som listar antal anställda i var och en av de fyra regionerna i
+--  UPPGIFT 12. Skriv en query som listar antal anställda i var och en av de fyra regionerna i
 -- tabellen company.regions
-SELECT 
-    *
-FROM
-    company.regions
-    
-SELECT 
-    *
-FROM
-    company.employees
-
-SELECT 
-    *
-FROM
-    company.employee_territory
-
+WITH NumberOfEmployeeInTerritory AS (
+    SELECT
+        COUNT(EmployeeId) AS CountEmployees,
+        TerritoryId
+    FROM
+        company.employee_territory
+    GROUP BY
+        TerritoryId
+)
 SELECT
-    *
+    cr.RegionDescription,
+    SUM(noe.CountEmployees) AS NumberOfEmployees
+FROM    
+    company.territories ct
+JOIN NumberOfEmployeeInTerritory noe ON ct.Id = noe.TerritoryId
+JOIN company.regions cr ON ct.RegionId = cr.Id
+GROUP BY
+    cr.RegionDescription;
+
+--  UPPGIFT 13. För betyg VG (endast följande uppgift):
+-- Vi har tidigare kollat på one-to-many och many-to-many joins. Det finns även
+-- det som brukar kallas för self-join, när en tabell joinar mot sig själv.
+-- Sök & läs på om self-joins!
+-- Använd en self-join för att lista alla (9) anställda och deras närmsta chef.
+-- De anställda ska visas i tre kolumner:
+-- Id – Den anställdes id.
+-- Name – Den anställdes titel och fullständiga namn (ex: Dr. Andrew Fuller)
+-- Reports to – Närmsta chefens titel och fullständiga namn.
+-- I de fall ReportsTo-kolumnen i company.employer är NULL, visa ’Nobody!’
+SELECT
+    e1.Id,
+    CONCAT(e1.TitleOfCourtesy , ' ', e1.FirstName, ' ', e1.LastName) AS Name,
+    CASE
+        WHEN e1.ReportsTo IS NULL THEN 'Nobody!'
+        ELSE CONCAT(e2.TitleOfCourtesy , ' ', e2.FirstName, ' ', e2.LastName) 
+    END AS [Reports to]
 FROM
-    company.territories
+    company.employees e1
+LEFT JOIN company.employees e2 ON e1.ReportsTo = e2.Id;
