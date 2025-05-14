@@ -41,6 +41,7 @@ FROM
 -- ’Mission count’ i resultatet vill vi ha antal uppdrag av varje operatör och typ. Ta
 -- bara med de grupper som har fler än ett (>1) uppdrag av samma typ och
 -- operatör.
+
 SELECT
     Operator,
     [Mission type],
@@ -60,6 +61,7 @@ ORDER BY
 -- ”SuccessfulMissions” på ett sådant sätt att alla värden i kolumnen ’Spacecraft’
 -- endast innehåller originalnamnet, dvs ta bort alla paranteser och deras
 -- innehåll. Ex: ”Pioneer 0 (Able I)” => ”Pioneer 0”.
+
 UPDATE
     SuccessfulMissions
 SET
@@ -144,6 +146,7 @@ SELECT
     *
 FROM
     NewUsers;
+
 -- UPPGIFT 9. Lägg till en ny användare (hitta på en) i tabellen ”NewUsers”.
 
 INSERT INTO NewUsers VALUES
@@ -160,6 +163,7 @@ WHERE
 -- Skriv en query som returnerar två kolumner ’gender’ och ’avarage age’, och två
 -- rader där ena raden visar medelåldern för män, och andra raden visar
 -- medelåldern på kvinnor för alla användare i tabellen ”NewUsers”.
+
 SELECT
     Gender,
     AVG(
@@ -180,6 +184,7 @@ GROUP By
 -- Product – produktens namn
 -- Supplier – namnet på företaget som leverar produkten
 -- Category – namnet på kategorin som produkten tillhör
+
 SELECT
     cp.Id,
     cp.ProductName AS Product,
@@ -192,6 +197,7 @@ JOIN company.categories cc ON cp.CategoryId = cc.Id;
 
 --  UPPGIFT 12. Skriv en query som listar antal anställda i var och en av de fyra regionerna i
 -- tabellen company.regions
+
 WITH NumberOfEmployeeInTerritory AS (
     SELECT
         COUNT(EmployeeId) AS CountEmployees,
@@ -221,6 +227,7 @@ GROUP BY
 -- Name – Den anställdes titel och fullständiga namn (ex: Dr. Andrew Fuller)
 -- Reports to – Närmsta chefens titel och fullständiga namn.
 -- I de fall ReportsTo-kolumnen i company.employer är NULL, visa ’Nobody!’
+
 SELECT
     e1.Id,
     CONCAT(e1.TitleOfCourtesy , ' ', e1.FirstName, ' ', e1.LastName) AS Name,

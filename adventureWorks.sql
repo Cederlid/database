@@ -95,3 +95,56 @@ HAVING
     SUM(Quantity) > 500
 ORDER BY
     ProductID ASC;
+
+--10
+
+SELECT
+    SUM(Quantity) AS Totalquantity
+FROM
+    Production.ProductInventory
+GROUP BY
+    (LocationID * 10);
+
+--11
+
+SELECT
+    p.BusinessEntityID,
+    p.FirstName,
+    p.LastName,
+    pp.PhoneNumber
+FROM
+    Person.PersonPhone pp
+JOIN
+    Person.Person p ON pp.BusinessEntityID = p.BusinessEntityID
+WHERE
+    p.LastName LIKE 'L%'
+ORDER BY 
+    p.LastName, p.FirstName;
+
+--12
+
+SELECT
+    SalesPersonID,
+    CustomerID,
+    SUM(SubTotal) AS sum_subtotal
+FROM
+    Sales.SalesOrderHeader
+GROUP BY ROLLUP (SalesPersonID, CustomerID);
+
+--13
+SELECT
+    LocationID,
+    Shelf,
+    SUM(Quantity) AS TotalQuantity
+FROM
+    Production.ProductInventory
+GROUP BY CUBE(LocationID, Shelf);
+
+--14
+SELECT
+    LocationID,
+    Shelf,
+    SUM(Quantity) AS TotalQuantity
+FROM    
+    Production.ProductInventory
+GROUP BY GROUPING SETS (ROLLUP(LocationID, Shelf), CUBE(LocationID, Shelf));
