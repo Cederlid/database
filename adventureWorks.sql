@@ -211,10 +211,27 @@ ORDER BY
 --20
 
 SELECT
-    pp.BusinessEntityID, pp.FirstName, pp.LastName
+    pp.BusinessEntityID, pp.LastName, pp.FirstName
 FROM
     Person.BusinessEntityContact b
 JOIN Person.ContactType p ON b.ContactTypeID = p.ContactTypeID
 JOIN Person.Person pp ON b.PersonID = pp.BusinessEntityID
 WHERE p.Name LIKE 'Purchasing Manager'
 ORDER BY LastName, FirstName;
+
+--21
+
+SELECT 
+    ROW_NUMBER() OVER (PARTITION BY pa.PostalCode ORDER BY sp.SalesYTD DESC) AS RowNumer,
+    pp.LastName,
+    sp.SalesYTD,
+    pa.PostalCode
+FROM 
+    Sales.SalesPerson sp 
+JOIN Person.Person pp ON sp.BusinessEntityID = pp.BusinessEntityID
+JOIN Person.BusinessEntityAddress pba ON sp.BusinessEntityID = pba.BusinessEntityID
+JOIN Person.Address pa ON pba.AddressID = pa.AddressID
+WHERE 
+    sp.TerritoryID IS NOT NULL AND sp.SalesYTD <> 0
+ORDER BY
+    pa.PostalCode
