@@ -129,7 +129,8 @@ SELECT
     SUM(SubTotal) AS sum_subtotal
 FROM
     Sales.SalesOrderHeader
-GROUP BY ROLLUP (SalesPersonID, CustomerID);
+GROUP BY ROLLUP (SalesPersonID, CustomerID)
+HAVING SalesPersonID IS NOT NULL;
 
 --13
 SELECT
@@ -148,3 +149,72 @@ SELECT
 FROM    
     Production.ProductInventory
 GROUP BY GROUPING SETS (ROLLUP(LocationID, Shelf), CUBE(LocationID, Shelf));
+
+--15
+
+SELECT
+    LocationID,
+    SUM(Quantity) AS TotalQuantity
+FROM
+    Production.ProductInventory
+GROUP BY
+    GROUPING SETS(LocationID, ());
+
+--16
+SELECT
+    a.City, 
+    COUNT(*) AS employeeCount
+FROM
+    Person.BusinessEntityAddress ba 
+JOIN Person.Address a ON ba.AddressID = a.AddressID
+GROUP BY 
+    a.City
+ORDER BY    
+    a.City;
+
+--17 
+
+SELECT  
+    YEAR(OrderDate) AS Year,
+    SUM(TotalDue) AS TotalDueAmount
+FROM Sales.SalesOrderHeader
+GROUP BY 
+    YEAR(OrderDate)
+ORDER BY 
+    YEAR(OrderDate);
+
+--18
+
+SELECT  
+    YEAR(OrderDate) AS Year,
+    SUM(TotalDue) AS TotalDueAmount
+FROM Sales.SalesOrderHeader
+GROUP BY 
+    YEAR(OrderDate)
+HAVING
+    YEAR(OrderDate) < 2016
+ORDER BY 
+    YEAR(OrderDate);
+
+--19
+
+SELECT
+    ContactTypeID, 
+    Name
+FROM
+    Person.ContactType
+WHERE 
+    Name LIKE '%Manager%'
+ORDER BY 
+    ContactTypeID DESC;
+
+--20
+
+SELECT
+    pp.BusinessEntityID, pp.FirstName, pp.LastName
+FROM
+    Person.BusinessEntityContact b
+JOIN Person.ContactType p ON b.ContactTypeID = p.ContactTypeID
+JOIN Person.Person pp ON b.PersonID = pp.BusinessEntityID
+WHERE p.Name LIKE 'Purchasing Manager'
+ORDER BY LastName, FirstName;
