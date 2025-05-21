@@ -235,3 +235,10 @@ WHERE
     sp.TerritoryID IS NOT NULL AND sp.SalesYTD <> 0
 ORDER BY
     pa.PostalCode
+
+--22
+
+SELECT 
+    *
+FROM
+    Person.BusinessEntityContact
